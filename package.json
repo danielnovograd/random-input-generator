@@ -3,9 +3,14 @@
   "version": "1.0.0",
   "description": "Random data generator for testing.",
   "main": "index.js",
+  "repository": "https://github.com/danielnovograd/random-input-generator",
   "scripts": {
     "test": "./node_modules/.bin/mocha --reporter spec"
   },
   "author": "Dan Novograd",
-  "license": "MIT"
+  "license": "MIT",
+  "devDependencies": {
+    "chai": "*",
+    "mocha": "*"
+  }
 }
