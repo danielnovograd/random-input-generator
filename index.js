@@ -17,7 +17,10 @@ const typeArray = ["number", "string", "boolean", "object"];
 
 const generator = {
   //create random number
-  number: (min = 0, max = 10000) => Math.floor(Math.random() * (max - min) + min),
+  number: (min = 0, max = 10000) =>
+    min > max ?
+      Error('Invalid Arguments: min argument must be less than max') :
+      Math.floor(Math.random() * (max - min) + min),
   //create random string, default (0-8 characters, can be symbols)
   string: function(minLength = 4, maxLength = 12, nonLetters = true, casing) {
     const length = this.number(minLength, maxLength);
