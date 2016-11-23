@@ -1,0 +1,11 @@
+{
+  "name": "random-input-generator",
+  "version": "1.0.0",
+  "description": "Random data generator for testing.",
+  "main": "index.js",
+  "scripts": {
+    "test": "test"
+  },
+  "author": "Dan Novograd",
+  "license": "MIT"
+}
