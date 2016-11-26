@@ -37,7 +37,10 @@ const generator = {
   },
   //check if code is for nonLetter
   isNonLetterCode: (code) => code < 65 || (code >= 91 && code <= 96) || code > 122,
-  characterGen: function(charCodeMin, charCodeMax, nonLetters) {
+  characterGen: function(charCodeMin = 32, charCodeMax = 127, nonLetters = true) {
+    if (typeof charCodeMin !== "number" || typeof nonLetters !== "boolean") {
+      throw Error('Invalid argument type. charCodes must be numbers and nonLetters must be boolean.')
+    }
     let charCodeIndex = this.number(charCodeMin, charCodeMax);
       while(charCodeIndex === 92 || (!nonLetters && this.isNonLetterCode(charCodeIndex))) {
         charCodeIndex = this.number(charCodeMin, charCodeMax);

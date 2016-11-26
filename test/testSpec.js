@@ -120,6 +120,16 @@ describe('Strings', () => {
           expect(isNonLetter).to.equal(false);
         });
       });
+      describe('.characterGen', () => {
+        it('should throw an error with invalid arguments', () => {
+          let invalidArg1 = fnRunner(generator.characterGen, true, 130, true);
+          let invalidArg2 = fnRunner(generator.characterGen, 35, false, false);
+          let invalidArg3 = fnRunner(generator.characterGen, 35, 120, 999);
+          expect(invalidArg1).to.throw()
+          expect(invalidArg2).to.throw()
+          expect(invalidArg3).to.throw()
+        });
+      });
     });
   });
 });
