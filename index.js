@@ -22,17 +22,25 @@ const generator = {
       Error('Invalid Arguments: min argument must be less than max') :
       Math.floor(Math.random() * (max - min) + min)
   },
-  //create random string, default (0-8 characters, can be symbols)
+  //create random string, default (0-8 characters, can be symbols, casing "upper" or "lower")
   string: function(minLength = 4, maxLength = 12, nonLetters = true, casing) {
-    const length = this.number(minLength, maxLength);
+    if (typeof minLength !== "number" || typeof maxLength !== "number" || typeof nonLetters !== "boolean" || (typeof casing !== "undefined" && typeof casing !== "string")) {
+      throw Error('Invalid argument type. minLength: number, maxLength: number, nonLetters: boolean, casing: string or undefined');
+    }
+    if (minLength > maxLength || minLength < 0) {
+      throw Error('Invalid length arguments: minLength must be less than maxLength.')
+    }
+    let specificLength;
+    if (minLength === maxLength) {
+      specificLength = maxLength;
+    }
+    const length = specificLength || this.number(minLength, maxLength);
     let randomString = "";
     let minCode = nonLetters ? 32 : 65;
     let maxCode = nonLetters ? 127 : 123;
-
     while(randomString.length < length) {
       randomString += this.characterGen(minCode, maxCode, nonLetters);
     };
-
     return casing ? this.enforceCase(randomString, casing.toLowerCase()) : randomString;
   },
   //check if code is for nonLetter
