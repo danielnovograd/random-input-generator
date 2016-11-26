@@ -17,16 +17,17 @@ const typeArray = ["number", "string", "boolean", "object"];
 
 const generator = {
   //create random number
-  number: (min = 0, max = 10000) =>
-    min > max ?
+  number: function(min = 0, max = 10001) {
+    return min > max ?
       Error('Invalid Arguments: min argument must be less than max') :
-      Math.floor(Math.random() * (max - min) + min),
+      Math.floor(Math.random() * (max - min) + min)
+  },
   //create random string, default (0-8 characters, can be symbols)
   string: function(minLength = 4, maxLength = 12, nonLetters = true, casing) {
     const length = this.number(minLength, maxLength);
     let randomString = "";
     let minCode = nonLetters ? 32 : 65;
-    let maxCode = nonLetters ? 125 : 122;
+    let maxCode = nonLetters ? 127 : 123;
 
     while(randomString.length < length) {
       randomString += this.characterGen(minCode, maxCode, nonLetters);
@@ -46,7 +47,7 @@ const generator = {
   enforceCase: (string, casing) => {
     if (casing === "upper") { return string.toUpperCase(); }
     else if (casing === "lower") { return string.toLowerCase(); }
-    else { console.error("Invalid casing argument: must be either 'upper' or 'lower'") }
+    else { throw Error("Invalid casing argument: must be either 'upper' or 'lower'") }
   },
   //generate object
     //
