@@ -32,7 +32,7 @@ describe('Numbers', () => {
         }
         counter--;
       }
-      expect(withinRange).to.equal(true)
+      expect(withinRange).to.equal(true);
     });
     it('should work with negative numbers for min and max', () => {
       let counter = 1000;
@@ -121,13 +121,51 @@ describe('Strings', () => {
         });
       });
       describe('.characterGen', () => {
+        let randomChar;
+        beforeEach(() => {
+          randomChar = generator.characterGen();
+        });
         it('should throw an error with invalid arguments', () => {
           let invalidArg1 = fnRunner(generator.characterGen, true, 130, true);
           let invalidArg2 = fnRunner(generator.characterGen, 35, false, false);
           let invalidArg3 = fnRunner(generator.characterGen, 35, 120, 999);
-          expect(invalidArg1).to.throw()
-          expect(invalidArg2).to.throw()
-          expect(invalidArg3).to.throw()
+          expect(invalidArg1).to.throw();
+          expect(invalidArg2).to.throw();
+          expect(invalidArg3).to.throw();
+        });
+        it('should return a string', () => {
+          expect(randomChar).to.be.a('string');
+        });
+        it('should return a string with char code between 32 and 127 by default', () => {
+          let charCode = generator.characterGen().charCodeAt(0);
+          expect(charCode).to.be.below(128).and.above(31);
+        });
+        it('should never return charCode 92 (backslash - \\)', () => {
+          let counter = 1000;
+          let noBackslash = true;
+          while(counter) {
+            let char = generator.characterGen();
+            if (char.charCodeAt(0) === 92) {
+              noBackslash = false;
+            };
+            counter--;
+          };
+          expect(noBackslash).to.equal(true);
+        });
+        it('should not return a character out of the specified range', () => {
+          let counter = 1000;
+          let withinRange = true;
+          while(counter) {
+            let min = number(32,65);
+            let max = number(66,127);
+            let char = generator.characterGen(min, max, true);
+            let generatedCharCode = char.charCodeAt(0)
+            if (generatedCharCode < min || generatedCharCode > max) {
+              withinRange = false;
+            };
+            counter--;
+          };
+          expect(withinRange).to.equal(true);
         });
       });
     });
