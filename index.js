@@ -17,26 +17,38 @@ const typeArray = ["number", "string", "boolean", "object"];
 
 const generator = {
   //create random number
-  number: (min = 0, max = 10000) =>
-    min > max ?
+  number: function(min = 0, max = 10001) {
+    return min > max ?
       Error('Invalid Arguments: min argument must be less than max') :
-      Math.floor(Math.random() * (max - min) + min),
-  //create random string, default (0-8 characters, can be symbols)
+      Math.floor(Math.random() * (max - min) + min)
+  },
+  //create random string, default (0-8 characters, can be symbols, casing "upper" or "lower")
   string: function(minLength = 4, maxLength = 12, nonLetters = true, casing) {
-    const length = this.number(minLength, maxLength);
+    if (typeof minLength !== "number" || typeof maxLength !== "number" || typeof nonLetters !== "boolean" || (typeof casing !== "undefined" && typeof casing !== "string")) {
+      throw Error('Invalid argument type. minLength: number, maxLength: number, nonLetters: boolean, casing: string or undefined');
+    }
+    if (minLength > maxLength || minLength < 0) {
+      throw Error('Invalid length arguments: minLength must be less than maxLength.')
+    }
+    let specificLength;
+    if (minLength === maxLength) {
+      specificLength = maxLength;
+    }
+    const length = specificLength || this.number(minLength, maxLength);
     let randomString = "";
     let minCode = nonLetters ? 32 : 65;
-    let maxCode = nonLetters ? 125 : 122;
-
+    let maxCode = nonLetters ? 127 : 123;
     while(randomString.length < length) {
       randomString += this.characterGen(minCode, maxCode, nonLetters);
     };
-
     return casing ? this.enforceCase(randomString, casing.toLowerCase()) : randomString;
   },
   //check if code is for nonLetter
   isNonLetterCode: (code) => code < 65 || (code >= 91 && code <= 96) || code > 122,
-  characterGen: function(charCodeMin, charCodeMax, nonLetters) {
+  characterGen: function(charCodeMin = 32, charCodeMax = 127, nonLetters = true) {
+    if (typeof charCodeMin !== "number" || typeof nonLetters !== "boolean") {
+      throw Error('Invalid argument type. charCodes must be numbers and nonLetters must be boolean.')
+    }
     let charCodeIndex = this.number(charCodeMin, charCodeMax);
       while(charCodeIndex === 92 || (!nonLetters && this.isNonLetterCode(charCodeIndex))) {
         charCodeIndex = this.number(charCodeMin, charCodeMax);
@@ -46,7 +58,7 @@ const generator = {
   enforceCase: (string, casing) => {
     if (casing === "upper") { return string.toUpperCase(); }
     else if (casing === "lower") { return string.toLowerCase(); }
-    else { console.error("Invalid casing argument: must be either 'upper' or 'lower'") }
+    else { throw Error("Invalid casing argument: must be either 'upper' or 'lower'") }
   },
   //generate object
     //
