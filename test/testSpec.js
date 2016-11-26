@@ -111,7 +111,15 @@ describe('Strings', () => {
           let isNonLetter = generator.isNonLetterCode(number(122,Infinity));
           expect(isNonLetter).to.equal(true);
         });
+        it('should return false for character codes greater between 65 and 90', () => {
+          let isNonLetter = generator.isNonLetterCode(number(65,90));
+          expect(isNonLetter).to.equal(false);
+        });
+        it('should return false for character codes greater between 65 and 90', () => {
+          let isNonLetter = generator.isNonLetterCode(number(97, 122));
+          expect(isNonLetter).to.equal(false);
+        });
       });
-    })
-  })
-})
+    });
+  });
+});
