@@ -11,6 +11,8 @@
   "license": "MIT",
   "devDependencies": {
     "chai": "*",
+    "eslint": "^3.11.1",
+    "eslint-plugin-react": "^6.7.1",
     "mocha": "*"
   }
 }

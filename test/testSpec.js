@@ -18,7 +18,7 @@ describe('Numbers (.number)', () => {
     });
     it('should not throw an error with default parameters', () => {
       let defaultNumRun = fnRunner(generator.number);
-      expect(defaultNumRun).to.not.throw()
+      expect(defaultNumRun).to.not.throw();
     });
   });
   describe('Random Numbers with Range', () => {
@@ -44,7 +44,7 @@ describe('Numbers (.number)', () => {
         }
         counter--;
       }
-      expect(allNegative).to.equal(true)
+      expect(allNegative).to.equal(true);
     });
     it('should throw an error for invalid arguments (max less than min)', () => {
       let invalidArgFn = fnRunner(generator.number, 10, 2);
@@ -73,7 +73,7 @@ describe('Strings (.string)', () => {
     });
     describe('.isNonLetterCode', () => {
       beforeEach(function() {
-        randomStr = generator.string()
+        randomStr = generator.string();
       });
       it('should return true for character codes less than 65', () => {
         let isNonLetter = generator.isNonLetterCode(number(0,64));
@@ -226,5 +226,37 @@ describe('Strings (.string)', () => {
       expect(randomStr1).to.equal(randomStr1.toUpperCase());
       expect(randomStr2).to.equal(randomStr2.toLowerCase());
     });
+  });
+});
+
+describe('Booleans (true || false)', () => {
+  it('generator.boolean should be a function', () => {
+    expect(generator.boolean).to.be.a('function');
+  });
+  it('should need no arguments', () => {
+    expect(generator.boolean()).to.not.throw();
+  });
+  it('should produce a boolean value', () => {
+    let bool = generator.boolean();
+    expect(bool).to.be.a('boolean');
+  });
+  it('should properly weight probability with argument', () => {
+    let blockCount = 10,
+        blockTruth = 0,
+        blockFalse = 0,
+        counter = 1000;
+    while(blockCount) {
+      let truth = 0,
+      falsehood = 0;
+      counter = 1000;
+      while (counter) {
+        //weight for 80% true
+        generator.boolean(80) ? truth++ : falsehood++;
+        counter--;
+      }
+      truth > 775 ? blockTruth++ : blockFalse++;
+    }
+    blockCount--;
+    expect(blockTruth).to.be.at.least(8);
   });
 });
