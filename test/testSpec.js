@@ -234,14 +234,15 @@ describe('Booleans (true || false)', () => {
     expect(generator.boolean).to.be.a('function');
   });
   it('should need no arguments', () => {
-    expect(generator.boolean()).to.not.throw();
+    let validFunc = fnRunner(generator.boolean);
+    expect(validFunc).to.not.throw();
   });
   it('should produce a boolean value', () => {
     let bool = generator.boolean();
     expect(bool).to.be.a('boolean');
   });
   it('should properly weight probability with argument', () => {
-    let blockCount = 10,
+    let blockCount = 100,
         blockTruth = 0,
         blockFalse = 0,
         counter = 1000;
@@ -255,8 +256,16 @@ describe('Booleans (true || false)', () => {
         counter--;
       }
       truth > 775 ? blockTruth++ : blockFalse++;
+      blockCount--;
     }
-    blockCount--;
     expect(blockTruth).to.be.at.least(8);
   });
+  it('should throw an error with invalid arguments', () => {
+    let invalidFunc1 = fnRunner(generator.boolean, "boolean plz");
+    let invalidFunc2 = fnRunner(generator.boolean, -5);
+    let invalidFunc3 = fnRunner(generator.boolean, 200);
+    expect(invalidFunc1).to.throw();
+    expect(invalidFunc2).to.throw();
+    expect(invalidFunc3).to.throw();
+  })
 });

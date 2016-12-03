@@ -60,8 +60,18 @@ const generator = {
     else if (casing === "lower") { return string.toLowerCase(); }
     else { throw Error("Invalid casing argument: must be either 'upper' or 'lower'") }
   },
+  boolean: (weightPercentage) => {
+    if(weightPercentage !== undefined) {
+      if (typeof weightPercentage !== "number") {
+        throw Error('Invalid argument: weightPercentage must be a number between 0 and 100');
+      }
+      else if (weightPercentage > 100 || weightPercentage < 0) {
+        throw Error('Invalid argument: weightPercentage must be a number between 0 and 100')
+      }
+    }
+    return Math.random() < (weightPercentage ? weightPercentage / 100 : .5)
+  },
   //generate object
-    //
   object: function(keyValPairs, optionalSkeleton, valPreference = ["random"], minKeyValPairs = 1, maxKeyValPairs = 10) {
     let result = {};
     //if skeleton argument is provided
