@@ -102,9 +102,9 @@ describe('Strings (.string)', () => {
         randomChar = generator.characterGen();
       });
       it('should throw an error with invalid arguments', () => {
-        let invalidArg1 = fnRunner(generator.characterGen, true, 130, true);
-        let invalidArg2 = fnRunner(generator.characterGen, 35, false, false);
-        let invalidArg3 = fnRunner(generator.characterGen, 35, 120, 999);
+        let invalidArg1 = generator.characterGen.bind(null, true, 130, true);
+        let invalidArg2 = generator.characterGen.bind(null, 35, false, false);
+        let invalidArg3 = generator.characterGen.bind(null, 35, 120, 999);
         expect(invalidArg1).to.throw();
         expect(invalidArg2).to.throw();
         expect(invalidArg3).to.throw();
@@ -182,18 +182,17 @@ describe('Strings (.string)', () => {
       expect(validLength).to.equal(true);
     });
     it('should not throw an error with default parameters', () => {
-      let defaultStrRun = fnRunner(generator.string.bind(generator));
-      expect(defaultStrRun).to.not.throw()
+      expect(generator.string).to.not.throw()
     });
   });
   describe('Custom Random Strings', () => {
     it('should throw an error if given invalid arguments', () => {
-      let invalidArg1 = fnRunner(generator.string, true, 10, true);
-      let invalidArg2 = fnRunner(generator.string, 4, "max", false);
-      let invalidArg3 = fnRunner(generator.string, 5, 8, 999);
-      let invalidArg4 = fnRunner(generator.string, 2, 12, true, 400);
-      let invalidArg5 = fnRunner(generator.string, -4, 12, false, "upper");
-      let invalidArg6 = fnRunner(generator.string, 13, 12, true, "lower");
+      let invalidArg1 = generator.string.bind(null, true, 10, true);
+      let invalidArg2 = generator.string.bind(null, 4, "max", false);
+      let invalidArg3 = generator.string.bind(null, 5, 8, 999);
+      let invalidArg4 = generator.string.bind(null, 2, 12, true, 400);
+      let invalidArg5 = generator.string.bind(null, -4, 12, false, "upper");
+      let invalidArg6 = generator.string.bind(null, 13, 12, true, "lower");
       expect(invalidArg1).to.throw();
       expect(invalidArg2).to.throw();
       expect(invalidArg3).to.throw();
@@ -234,8 +233,7 @@ describe('Booleans (true || false)', () => {
     expect(generator.boolean).to.be.a('function');
   });
   it('should need no arguments', () => {
-    let validFunc = fnRunner(generator.boolean);
-    expect(validFunc).to.not.throw();
+    expect(generator.boolean).to.not.throw();
   });
   it('should produce a boolean value', () => {
     let bool = generator.boolean();
@@ -261,9 +259,9 @@ describe('Booleans (true || false)', () => {
     expect(blockTruth).to.be.at.least(8);
   });
   it('should throw an error with invalid arguments', () => {
-    let invalidFunc1 = fnRunner(generator.boolean, "boolean plz");
-    let invalidFunc2 = fnRunner(generator.boolean, -5);
-    let invalidFunc3 = fnRunner(generator.boolean, 200);
+    let invalidFunc1 = generator.boolean.bind(null, "boolean plz");
+    let invalidFunc2 = generator.boolean.bind(null, -5);
+    let invalidFunc3 = generator.boolean.bind(null, 200);
     expect(invalidFunc1).to.throw();
     expect(invalidFunc2).to.throw();
     expect(invalidFunc3).to.throw();

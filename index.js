@@ -15,15 +15,12 @@ const generate = {
 
 const typeArray = ["number", "string", "boolean", "object"];
 
-const generator = {
-  //create random number
-  number: function(min = 0, max = 10001) {
-    return min > max ?
+//create random number
+const number = (min = 0, max = 10001) => min > max ?
       Error('Invalid Arguments: min argument must be less than max') :
-      Math.floor(Math.random() * (max - min) + min)
-  },
+      Math.floor(Math.random() * (max - min) + min);
   //create random string, default (0-8 characters, can be symbols, casing "upper" or "lower")
-  string: function(minLength = 4, maxLength = 12, nonLetters = true, casing) {
+const string = (minLength = 4, maxLength = 12, nonLetters = true, casing) => {
     if (typeof minLength !== "number" || typeof maxLength !== "number" || typeof nonLetters !== "boolean" || (typeof casing !== "undefined" && typeof casing !== "string")) {
       throw Error('Invalid argument type. minLength: number, maxLength: number, nonLetters: boolean, casing: string or undefined');
     }
@@ -34,33 +31,33 @@ const generator = {
     if (minLength === maxLength) {
       specificLength = maxLength;
     }
-    const length = specificLength || this.number(minLength, maxLength);
+    const length = specificLength || number(minLength, maxLength);
     let randomString = "";
     let minCode = nonLetters ? 32 : 65;
     let maxCode = nonLetters ? 127 : 123;
     while(randomString.length < length) {
-      randomString += this.characterGen(minCode, maxCode, nonLetters);
+      randomString += characterGen(minCode, maxCode, nonLetters);
     };
-    return casing ? this.enforceCase(randomString, casing.toLowerCase()) : randomString;
-  },
+    return casing ? enforceCase(randomString, casing.toLowerCase()) : randomString;
+  };
   //check if code is for nonLetter
-  isNonLetterCode: (code) => code < 65 || (code >= 91 && code <= 96) || code > 122,
-  characterGen: function(charCodeMin = 32, charCodeMax = 127, nonLetters = true) {
-    if (typeof charCodeMin !== "number" || typeof nonLetters !== "boolean") {
+  const isNonLetterCode = (code) => code < 65 || (code >= 91 && code <= 96) || code > 122;
+  const characterGen = (charCodeMin = 32, charCodeMax = 127, nonLetters = true) => {
+    if (typeof charCodeMin !== "number" || typeof charCodeMax !== "number" || typeof nonLetters !== "boolean") {
       throw Error('Invalid argument type. charCodes must be numbers and nonLetters must be boolean.')
     }
-    let charCodeIndex = this.number(charCodeMin, charCodeMax);
-      while(charCodeIndex === 92 || (!nonLetters && this.isNonLetterCode(charCodeIndex))) {
-        charCodeIndex = this.number(charCodeMin, charCodeMax);
+    let charCodeIndex = number(charCodeMin, charCodeMax);
+      while(charCodeIndex === 92 || (!nonLetters && isNonLetterCode(charCodeIndex))) {
+        charCodeIndex = number(charCodeMin, charCodeMax);
       }
     return String.fromCharCode(charCodeIndex);
-  },
-  enforceCase: (string, casing) => {
+  };
+  const enforceCase = (string, casing) => {
     if (casing === "upper") { return string.toUpperCase(); }
     else if (casing === "lower") { return string.toLowerCase(); }
     else { throw Error("Invalid casing argument: must be either 'upper' or 'lower'") }
-  },
-  boolean: (weightPercentage) => {
+  };
+  const boolean = (weightPercentage) => {
     if(weightPercentage !== undefined) {
       if (typeof weightPercentage !== "number") {
         throw Error('Invalid argument: weightPercentage must be a number between 0 and 100');
@@ -70,9 +67,9 @@ const generator = {
       }
     }
     return Math.random() < (weightPercentage ? weightPercentage / 100 : .5)
-  },
+  };
   //generate object
-  object: function(keyValPairs, optionalSkeleton, valPreference = ["random"], minKeyValPairs = 1, maxKeyValPairs = 10) {
+  const object = (keyValPairs, optionalSkeleton, valPreference = ["random"], minKeyValPairs = 1, maxKeyValPairs = 10) => {
     let result = {};
     //if skeleton argument is provided
     if (optionalSkeleton) {
@@ -93,30 +90,38 @@ const generator = {
       }
     }
     else {
-      const keyVals = keyValPairs || this.number(minKeyValPairs, maxKeyValPairs);
+      const keyVals = keyValPairs || number(minKeyValPairs, maxKeyValPairs);
       let keyValCount = 0;
       while (keyValCount < keyVals) {
-        let key = this.string(1,6, false, "lower");
+        let key = string(1,6, false, "lower");
         let val = generate.random();
         result[key] = val;
         keyValCount++
       };
     }
     return result;
-  },
+  };
   //generate array of values, randomized by default
-  array: function(maxLength = 10, valTypes = ["random"], templateArray) {
-    maxLength = maxLength || this.number(0, 10);
+  const array = (maxLength = 10, valTypes = ["random"], templateArray) => {
+    maxLength = maxLength || number(0, 10);
     if (templateArray && !Array.isArray(templateArray)) {
       console.error("Invalid templateArray: Not an array.")
     }
     let arr = templateArray || [];
     while(arr.length < maxLength) {
-      let valType = valTypes.length > 1 ? this.number(0,valTypes.length) : valTypes[0]
+      let valType = valTypes.length > 1 ? number(0,valTypes.length) : valTypes[0]
       arr.push(generate[valType]());
     }
     return arr;
   }
-}
 
-module.exports = generator;
+module.exports = {
+  number: number,
+  string: string,
+  isNonLetterCode: isNonLetterCode,
+  characterGen: characterGen,
+  enforceCase: enforceCase,
+  boolean: boolean,
+  object: object,
+  array: array
+}
