@@ -116,12 +116,12 @@ const string = (minLength = 4, maxLength = 12, nonLetters = true, casing) => {
   }
 
 module.exports = {
-  number: number,
-  string: string,
+  generateNumber: number,
+  generateString: string,
   isNonLetterCode: isNonLetterCode,
   characterGen: characterGen,
   enforceCase: enforceCase,
-  boolean: boolean,
+  generateBoolean: boolean,
   object: object,
   array: array
 }
