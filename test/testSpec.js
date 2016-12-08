@@ -1,7 +1,8 @@
 const {expect, assert} = require('chai');
-const generator = require('../index.js')
-const { generateNumber, generateString, generateBoolean } = require('../index.js');
+const generator = require('../index.js');
 const { fnRunner } = require('./test_helpers.js');
+
+const { generateNumber, generateString, generateBoolean } = generator;
 
 describe('Numbers (.number)', () => {
   let randomNum;

@@ -16,11 +16,11 @@ const generate = {
 const typeArray = ["number", "string", "boolean", "object"];
 
 //create random number
-const number = (min = 0, max = 10001) => min > max ?
+const generateNumber = (min = 0, max = 10001) => min > max ?
       Error('Invalid Arguments: min argument must be less than max') :
       Math.floor(Math.random() * (max - min) + min);
   //create random string, default (0-8 characters, can be symbols, casing "upper" or "lower")
-const string = (minLength = 4, maxLength = 12, nonLetters = true, casing) => {
+const generateString = (minLength = 4, maxLength = 12, nonLetters = true, casing) => {
     if (typeof minLength !== "number" || typeof maxLength !== "number" || typeof nonLetters !== "boolean" || (typeof casing !== "undefined" && typeof casing !== "string")) {
       throw Error('Invalid argument type. minLength: number, maxLength: number, nonLetters: boolean, casing: string or undefined');
     }
@@ -31,7 +31,7 @@ const string = (minLength = 4, maxLength = 12, nonLetters = true, casing) => {
     if (minLength === maxLength) {
       specificLength = maxLength;
     }
-    const length = specificLength || number(minLength, maxLength);
+    const length = specificLength || generateNumber(minLength, maxLength);
     let randomString = "";
     let minCode = nonLetters ? 32 : 65;
     let maxCode = nonLetters ? 127 : 123;
@@ -46,18 +46,18 @@ const string = (minLength = 4, maxLength = 12, nonLetters = true, casing) => {
     if (typeof charCodeMin !== "number" || typeof charCodeMax !== "number" || typeof nonLetters !== "boolean") {
       throw Error('Invalid argument type. charCodes must be numbers and nonLetters must be boolean.')
     }
-    let charCodeIndex = number(charCodeMin, charCodeMax);
+    let charCodeIndex = generateNumber(charCodeMin, charCodeMax);
       while(charCodeIndex === 92 || (!nonLetters && isNonLetterCode(charCodeIndex))) {
-        charCodeIndex = number(charCodeMin, charCodeMax);
+        charCodeIndex = generateNumber(charCodeMin, charCodeMax);
       }
     return String.fromCharCode(charCodeIndex);
   };
-  const enforceCase = (string, casing) => {
-    if (casing === "upper") { return string.toUpperCase(); }
-    else if (casing === "lower") { return string.toLowerCase(); }
+  const enforceCase = (str, casing) => {
+    if (casing === "upper") { return str.toUpperCase(); }
+    else if (casing === "lower") { return str.toLowerCase(); }
     else { throw Error("Invalid casing argument: must be either 'upper' or 'lower'") }
   };
-  const boolean = (weightPercentage) => {
+  const generateBoolean = (weightPercentage) => {
     if(weightPercentage !== undefined) {
       if (typeof weightPercentage !== "number") {
         throw Error('Invalid argument: weightPercentage must be a number between 0 and 100');
@@ -90,7 +90,7 @@ const string = (minLength = 4, maxLength = 12, nonLetters = true, casing) => {
       }
     }
     else {
-      const keyVals = keyValPairs || number(minKeyValPairs, maxKeyValPairs);
+      const keyVals = keyValPairs || generateNumber(minKeyValPairs, maxKeyValPairs);
       let keyValCount = 0;
       while (keyValCount < keyVals) {
         let key = string(1,6, false, "lower");
@@ -103,25 +103,25 @@ const string = (minLength = 4, maxLength = 12, nonLetters = true, casing) => {
   };
   //generate array of values, randomized by default
   const array = (maxLength = 10, valTypes = ["random"], templateArray) => {
-    maxLength = maxLength || number(0, 10);
+    maxLength = maxLength || generateNumber(0, 10);
     if (templateArray && !Array.isArray(templateArray)) {
       console.error("Invalid templateArray: Not an array.")
     }
     let arr = templateArray || [];
     while(arr.length < maxLength) {
-      let valType = valTypes.length > 1 ? number(0,valTypes.length) : valTypes[0]
+      let valType = valTypes.length > 1 ? generateNumber(0,valTypes.length) : valTypes[0]
       arr.push(generate[valType]());
     }
     return arr;
   }
 
 module.exports = {
-  generateNumber: number,
-  generateString: string,
+  generateNumber,
+  generateString,
   isNonLetterCode: isNonLetterCode,
   characterGen: characterGen,
   enforceCase: enforceCase,
-  generateBoolean: boolean,
+  generateBoolean,
   object: object,
   array: array
 }
