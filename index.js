@@ -69,7 +69,7 @@ const generateString = (minLength = 4, maxLength = 12, nonLetters = true, casing
     return Math.random() < (weightPercentage ? weightPercentage / 100 : .5)
   };
   //generate object
-  const object = (keyValPairs, optionalSkeleton, valPreference = ["random"], minKeyValPairs = 1, maxKeyValPairs = 10) => {
+  const generateObject = (keyValPairs, optionalSkeleton, valPreference = ["random"], minKeyValPairs = 2, maxKeyValPairs = 6) => {
     let result = {};
     //if skeleton argument is provided
     if (optionalSkeleton) {
