@@ -93,7 +93,7 @@ const generateString = (minLength = 4, maxLength = 12, nonLetters = true, casing
       const keyVals = keyValPairs || generateNumber(minKeyValPairs, maxKeyValPairs);
       let keyValCount = 0;
       while (keyValCount < keyVals) {
-        let key = string(1,6, false, "lower");
+        let key = generateString(1,6, false, "lower");
         let val = generate.random();
         result[key] = val;
         keyValCount++
@@ -122,6 +122,6 @@ module.exports = {
   characterGen: characterGen,
   enforceCase: enforceCase,
   generateBoolean,
-  object: object,
+  generateObject,
   array: array
 }
