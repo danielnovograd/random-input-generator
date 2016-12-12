@@ -1,14 +1,14 @@
 const generate = {
-  number: ((...args) => generator.number.apply(this, args)),
-  string: (() => generator.string()),
-  boolean: (() => Math.random() < .5),
-  object: (() => generator.object(5)),
+  number: () => generateNumber(),
+  string: () => generateString(),
+  boolean: () => Math.random() < .5,
+  object: () => generateObject(5),
   random: function(...types){
     if (types.includes("object") || types.includes("array")){
       console.error("Cannot randomly generate object.");
       return;
     }
-    let type = types.length ? types[this.number(0, types.length)] : typeArray[generator.number(0,3)]
+    let type = types.length ? types[this.number(0, types.length)] : typeArray[generateNumber(0,3)]
     return this[type]();
   }
 };
