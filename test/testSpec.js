@@ -1,9 +1,9 @@
 const {expect, assert} = require('chai');
 const generator = require('../index.js');
 const { fnRunner } = require('./test_helpers.js');
-const { generateNumber, generateString, generateBoolean } = generator;
+const { generateNumber, generateString, generateBoolean, generateObject } = generator;
 
-describe('Numbers (.number)', () => {
+describe('Numbers (generateNumber)', () => {
   let randomNum;
   describe('Default Random Numbers', () => {
     beforeEach(() => {
@@ -53,7 +53,7 @@ describe('Numbers (.number)', () => {
   });
 });
 
-describe('Strings (.string)', () => {
+describe('Strings (generateString)', () => {
   let randomStr;
   describe('Random String Helpers', () => {
     describe('.enforceCase', () => {
@@ -228,7 +228,7 @@ describe('Strings (.string)', () => {
   });
 });
 
-describe('Booleans (true || false)', () => {
+describe('Booleans (generateBoolean)', () => {
   it('generator.boolean should be a function', () => {
     expect(generateBoolean).to.be.a('function');
   });
@@ -266,4 +266,16 @@ describe('Booleans (true || false)', () => {
     expect(invalidFunc2).to.throw();
     expect(invalidFunc3).to.throw();
   })
+});
+
+describe('Objects (generateObject)', () => {
+  describe('Default Random Object', () => {
+    it('should be a function', () => {
+      expect(generateObject).to.be.a('function');
+    });
+    it('should return an object', () => {
+      expect(generateObject).to.not.throw();
+      expect(generateObject()).to.be.a('object');
+    });
+  });
 });

@@ -1,14 +1,14 @@
 const generate = {
-  number: ((...args) => generator.number.apply(this, args)),
-  string: (() => generator.string()),
-  boolean: (() => Math.random() < .5),
-  object: (() => generator.object(5)),
+  number: () => generateNumber(),
+  string: () => generateString(),
+  boolean: () => Math.random() < .5,
+  object: () => generateObject(5),
   random: function(...types){
     if (types.includes("object") || types.includes("array")){
       console.error("Cannot randomly generate object.");
       return;
     }
-    let type = types.length ? types[this.number(0, types.length)] : typeArray[generator.number(0,3)]
+    let type = types.length ? types[this.number(0, types.length)] : typeArray[generateNumber(0,3)]
     return this[type]();
   }
 };
@@ -69,7 +69,7 @@ const generateString = (minLength = 4, maxLength = 12, nonLetters = true, casing
     return Math.random() < (weightPercentage ? weightPercentage / 100 : .5)
   };
   //generate object
-  const object = (keyValPairs, optionalSkeleton, valPreference = ["random"], minKeyValPairs = 1, maxKeyValPairs = 10) => {
+  const generateObject = (keyValPairs, optionalSkeleton, valPreference = ["random"], minKeyValPairs = 2, maxKeyValPairs = 6) => {
     let result = {};
     //if skeleton argument is provided
     if (optionalSkeleton) {
@@ -93,7 +93,7 @@ const generateString = (minLength = 4, maxLength = 12, nonLetters = true, casing
       const keyVals = keyValPairs || generateNumber(minKeyValPairs, maxKeyValPairs);
       let keyValCount = 0;
       while (keyValCount < keyVals) {
-        let key = string(1,6, false, "lower");
+        let key = generateString(1,6, false, "lower");
         let val = generate.random();
         result[key] = val;
         keyValCount++
@@ -122,6 +122,6 @@ module.exports = {
   characterGen: characterGen,
   enforceCase: enforceCase,
   generateBoolean,
-  object: object,
+  generateObject,
   array: array
 }
