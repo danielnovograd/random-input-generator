@@ -12,6 +12,7 @@ const generate = {
 };
 
 const typeArray = ["number", "string", "boolean", "object"];
+let primitives = ["number", "string", "boolean"];
 
 //create random number
 const generateNumber = (min = 0, max = 10000) => min > max ?
@@ -85,19 +86,19 @@ const generateObject = (keyValPairs, optionalSkeleton, valPreference = ["random"
         result[key] = generate[optionalSkeleton[key]] ? generate[optionalSkeleton[key]]()
           : optionalSkeleton[key] || generate.random();
       }
-    }
+    };
   }
   else {
     const keyVals = keyValPairs || generateNumber(minKeyValPairs, maxKeyValPairs);
     let keyValCount = 0;
-    let depth = 1;
+    let depth = 0;
 
     while (keyValCount < keyVals) {
       let key = generateString(4,6, false, "lower");
       let val;
       let valType = generate.type();
       if (valType === "object") {
-        val = objectDepthControl({}, depth);
+        val = objectDepthControl({}, depth + 1);
       }
       else {
         val = generate[valType]();
@@ -105,7 +106,7 @@ const generateObject = (keyValPairs, optionalSkeleton, valPreference = ["random"
       result[key] = val;
       keyValCount++
     };
-  }
+  };
   return result;
 };
 
@@ -113,22 +114,16 @@ const generateObject = (keyValPairs, optionalSkeleton, valPreference = ["random"
   //maxDepth will be 3 levels
   //every time another nested object is randomly generated, add to depth and build new object
 const objectDepthControl = function(currentObject, depth, keyVals) {
-  var keyVals = generateNumber(1, 3);
+  var keyVals = generateNumber(1, 5);
   let keyValCount = 0;
-  if (depth >= 3) {
-    let primitives = ["number", "string", "boolean"];
-    while (keyValCount < keyVals) {
-      let key = generateString(1,6, false, "lower");
-      let val = generate.random(...primitives);
-      currentObject[key] = val;
-      keyValCount++
-    };
-  }
-  else {
-    while (keyValCount < keyVals) {
-      let key = generateString(1,6, false, "lower");
-      let val;
-      let valType = generate.type();
+  let val;
+  while (keyValCount < keyVals) {
+    let key = generateString(4,6, false, "lower");
+    if (depth > 3) {
+      val = generate.random(...primitives);
+    }
+    else {
+      var valType = generate.type();
       if (valType === "object") {
         val = objectDepthControl({}, depth + 1);
       }
@@ -136,9 +131,9 @@ const objectDepthControl = function(currentObject, depth, keyVals) {
         console.log(valType)
         val = generate[valType]();
       }
-      currentObject[key] = val;
-      keyValCount++
     };
+    currentObject[key] = val;
+    keyValCount++;
   };
   return currentObject;
 };
