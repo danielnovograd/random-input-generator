@@ -12,7 +12,7 @@ const generate = {
 };
 
 const typeArray = ["number", "string", "boolean", "object"];
-let primitives = ["number", "string", "boolean"];
+const primitives = ["number", "string", "boolean"];
 
 //create random number
 const generateNumber = (min = 0, max = 10000) => min > max ?
@@ -77,11 +77,15 @@ const generateObject = (keyValPairs, optionalSkeleton, valPreference = ["random"
     }
     //if array of keys is provided --> vals are randomized
     else if (Array.isArray(optionalSkeleton)) {
-      optionalSkeleton.forEach(key => result[key] = generate.random());
+      optionalSkeleton.forEach(key => {
+        let valType = generate.type();
+        val = valType === "object" ? objectDepthControl({}, 1) : generate[valType]();
+        result[key] = val;
+      });
     }
     //if skeleton object provided: keys with default values
     else {
-      result = optionalSkeleton
+      result = optionalSkeleton;
       for (var key in optionalSkeleton) {
         result[key] = generate[optionalSkeleton[key]] ? generate[optionalSkeleton[key]]()
           : optionalSkeleton[key] || generate.random();
