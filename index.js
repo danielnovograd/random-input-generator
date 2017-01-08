@@ -73,7 +73,7 @@ const generateObject = (keyValPairs, optionalSkeleton, valPreference = ["random"
   //if skeleton argument is provided
   if (optionalSkeleton) {
     if (typeof optionalSkeleton !== "object") {
-      console.error("Invalid object skeleton: You can provide a config object or an array of desired keys.")
+      throw Error("Invalid object skeleton: You can provide a config object or an array of desired keys.")
     }
     //if array of keys is provided --> vals are randomized
     else if (Array.isArray(optionalSkeleton)) {
@@ -85,27 +85,11 @@ const generateObject = (keyValPairs, optionalSkeleton, valPreference = ["random"
       for (var key in optionalSkeleton) {
         result[key] = generate[optionalSkeleton[key]] ? generate[optionalSkeleton[key]]()
           : optionalSkeleton[key] || generate.random();
-      }
+      };
     };
   }
   else {
-    const keyVals = keyValPairs || generateNumber(minKeyValPairs, maxKeyValPairs);
-    let keyValCount = 0;
-    let depth = 0;
-
-    while (keyValCount < keyVals) {
-      let key = generateString(4,6, false, "lower");
-      let val;
-      let valType = generate.type();
-      if (valType === "object") {
-        val = objectDepthControl({}, depth + 1);
-      }
-      else {
-        val = generate[valType]();
-      }
-      result[key] = val;
-      keyValCount++
-    };
+    return objectDepthControl({}, 0, keyValPairs || generateNumber(minKeyValPairs, maxKeyValPairs));
   };
   return result;
 };
@@ -114,7 +98,7 @@ const generateObject = (keyValPairs, optionalSkeleton, valPreference = ["random"
   //maxDepth will be 3 levels
   //every time another nested object is randomly generated, add to depth and build new object
 const objectDepthControl = function(currentObject, depth, keyVals) {
-  var keyVals = generateNumber(1, 5);
+  var keyVals = keyVals || generateNumber(1, 5);
   let keyValCount = 0;
   let val;
   while (keyValCount < keyVals) {
@@ -124,13 +108,7 @@ const objectDepthControl = function(currentObject, depth, keyVals) {
     }
     else {
       var valType = generate.type();
-      if (valType === "object") {
-        val = objectDepthControl({}, depth + 1);
-      }
-      else {
-        console.log(valType)
-        val = generate[valType]();
-      }
+      val = valType === "object" ? objectDepthControl({}, depth + 1) : generate[valType]();
     };
     currentObject[key] = val;
     keyValCount++;
