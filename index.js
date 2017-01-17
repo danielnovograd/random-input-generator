@@ -4,21 +4,20 @@ const generate = {
   boolean: () => Math.random() < .5,
   object: () => generateObject(5),
   random: function(...types){
-    if (types.includes("object") || types.includes("array")){
-      console.error("Cannot randomly generate object.");
-      return;
-    }
-    let type = types.length ? types[this.number(0, types.length)] : typeArray[generateNumber(0,3)]
+    let typeIndex = types.length ? generateNumber(0, types.length - 1) : generateNumber(0,3);
+    let type = types.length ? types[typeIndex] : typeArray[typeIndex];
     return this[type]();
-  }
+  },
+  type: () => typeArray[generateNumber(0, typeArray.length - 1)]
 };
 
 const typeArray = ["number", "string", "boolean", "object"];
+const primitives = ["number", "string", "boolean"];
 
 //create random number
-const generateNumber = (min = 0, max = 10001) => min > max ?
+const generateNumber = (min = 0, max = 10000) => min > max ?
       Error('Invalid Arguments: min argument must be less than max') :
-      Math.floor(Math.random() * (max - min) + min);
+      Math.floor(Math.random() * (max + 1 - min) + min);
   //create random string, default (0-8 characters, can be symbols, casing "upper" or "lower")
 const generateString = (minLength = 4, maxLength = 12, nonLetters = true, casing) => {
     if (typeof minLength !== "number" || typeof maxLength !== "number" || typeof nonLetters !== "boolean" || (typeof casing !== "undefined" && typeof casing !== "string")) {
@@ -52,12 +51,12 @@ const generateString = (minLength = 4, maxLength = 12, nonLetters = true, casing
       }
     return String.fromCharCode(charCodeIndex);
   };
-  const enforceCase = (str, casing) => {
+const enforceCase = (str, casing) => {
     if (casing === "upper") { return str.toUpperCase(); }
     else if (casing === "lower") { return str.toLowerCase(); }
     else { throw Error("Invalid casing argument: must be either 'upper' or 'lower'") }
   };
-  const generateBoolean = (weightPercentage) => {
+const generateBoolean = (weightPercentage) => {
     if(weightPercentage !== undefined) {
       if (typeof weightPercentage !== "number") {
         throw Error('Invalid argument: weightPercentage must be a number between 0 and 100');
@@ -66,61 +65,88 @@ const generateString = (minLength = 4, maxLength = 12, nonLetters = true, casing
         throw Error('Invalid argument: weightPercentage must be a number between 0 and 100')
       }
     }
-    return Math.random() < (weightPercentage ? weightPercentage / 100 : .5)
+    return Math.random() < (weightPercentage ? weightPercentage / 100 : .5);
   };
   //generate object
-  const generateObject = (keyValPairs, optionalSkeleton, valPreference = ["random"], minKeyValPairs = 2, maxKeyValPairs = 6) => {
-    let result = {};
-    //if skeleton argument is provided
-    if (optionalSkeleton) {
-      if (typeof optionalSkeleton !== "object") {
-        console.error("Invalid object skeleton: You can provide a config object or an array of desired keys.")
-      }
-      //if array of keys is provided --> vals are randomized
-      else if (Array.isArray(optionalSkeleton)) {
-        optionalSkeleton.forEach(key => result[key] = generate.random());
-      }
-      //if skeleton object provided: keys with default values
-      else {
-        result = optionalSkeleton
-        for (var key in optionalSkeleton) {
-          result[key] = generate[optionalSkeleton[key]] ? generate[optionalSkeleton[key]]()
-            : optionalSkeleton[key] || generate.random();
+const generateObject = function({keyValPairs, optionalSkeleton, valPreference = [], minKeyValPairs = 2, maxKeyValPairs = 6, maxDepth} = {}) {
+  let result = {};
+  if (arguments[0] !== null && typeof arguments[0] !== "object" && arguments[0] !== undefined) {
+    throw new TypeError("Invalid parameter: must provide configuration object.")
+  }
+  if (valPreference.length && !valPreference.every(type => generate[type])) {
+    throw Error("Invalid parameter: enter valPreferences that align with generate object's keys.")
+  }
+  //if skeleton argument is provided
+  if (optionalSkeleton) {
+    if (typeof optionalSkeleton !== "object") {
+      throw Error("Invalid object skeleton: You can provide a config object or an array of desired keys.")
+    }
+    //if array of keys is provided --> vals are randomized
+    else if (Array.isArray(optionalSkeleton)) {
+      optionalSkeleton.forEach(key => {
+        if (typeof key !== "string") {
+          throw Error("Invalid key type: All properties of destination object must be strings");
         }
+        let valType = valPreference.length ? valPreference(generateNumber(0, valPreference.length - 1)) : generate.type();
+        val = valType === "object" ? objectDepthControl({}, 1) : generate[valType]();
+        result[key] = val;
+      });
+    }
+    //if skeleton object provided: keys with default values
+    else {
+      if (keyValPairs <= Object.keys(optionalSkeleton).length) {
+        throw Error("Invalid keyValPairs: must be integer greater than existing keyValPairs in skeleton object.")
       }
+      return objectDepthControl(optionalSkeleton, 0, keyValPairs, maxDepth);
+    };
+  }
+  else {
+    return objectDepthControl({}, 0, keyValPairs || generateNumber(minKeyValPairs, maxKeyValPairs), maxDepth);
+  };
+  return result;
+};
+
+//if object is randomly generated, control depth so that it can only nest 3 levels
+  //maxDepth will be 3 levels
+  //every time another nested object is randomly generated, add to depth and build new object
+const objectDepthControl = function(currentObject, depth, keyVals, maxDepth = 3) {
+  var keyVals = keyVals || generateNumber(1, 5);
+  let keyValCount = Object.keys(currentObject).length || 0;
+  let val;
+  while (keyValCount < keyVals) {
+    let key = generateString(4,6, false, "lower");
+    if (depth > maxDepth) {
+      val = generate.random(...primitives);
     }
     else {
-      const keyVals = keyValPairs || generateNumber(minKeyValPairs, maxKeyValPairs);
-      let keyValCount = 0;
-      while (keyValCount < keyVals) {
-        let key = generateString(1,6, false, "lower");
-        let val = generate.random();
-        result[key] = val;
-        keyValCount++
-      };
-    }
-    return result;
+      var valType = generate.type();
+      val = valType === "object" ? objectDepthControl({}, depth + 1) : generate[valType]();
+    };
+    currentObject[key] = val;
+    keyValCount++;
   };
+  return currentObject;
+};
   //generate array of values, randomized by default
-  const array = (maxLength = 10, valTypes = ["random"], templateArray) => {
-    maxLength = maxLength || generateNumber(0, 10);
-    if (templateArray && !Array.isArray(templateArray)) {
-      console.error("Invalid templateArray: Not an array.")
-    }
-    let arr = templateArray || [];
-    while(arr.length < maxLength) {
-      let valType = valTypes.length > 1 ? generateNumber(0,valTypes.length) : valTypes[0]
-      arr.push(generate[valType]());
-    }
-    return arr;
+const array = (maxLength = 10, valTypes = ["random"], templateArray) => {
+  maxLength = maxLength || generateNumber(0, 10);
+  if (templateArray && !Array.isArray(templateArray)) {
+    console.error("Invalid templateArray: Not an array.")
   }
+  let arr = templateArray || [];
+  while(arr.length < maxLength) {
+    let valType = valTypes.length > 1 ? generateNumber(0,valTypes.length) : valTypes[0]
+    arr.push(generate[valType]());
+  }
+  return arr;
+};
 
 module.exports = {
   generateNumber,
   generateString,
-  isNonLetterCode: isNonLetterCode,
-  characterGen: characterGen,
-  enforceCase: enforceCase,
+  isNonLetterCode,
+  characterGen,
+  enforceCase,
   generateBoolean,
   generateObject,
   array: array
