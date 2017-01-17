@@ -68,7 +68,7 @@ const generateBoolean = (weightPercentage) => {
     return Math.random() < (weightPercentage ? weightPercentage / 100 : .5);
   };
   //generate object
-const generateObject = function({keyValPairs, optionalSkeleton, valPreference = [], minKeyValPairs = 2, maxKeyValPairs = 6} = {}) {
+const generateObject = function({keyValPairs, optionalSkeleton, valPreference = [], minKeyValPairs = 2, maxKeyValPairs = 6, maxDepth} = {}) {
   let result = {};
   if (arguments[0] !== null && typeof arguments[0] !== "object" && arguments[0] !== undefined) {
     throw new TypeError("Invalid parameter: must provide configuration object.")
@@ -97,11 +97,11 @@ const generateObject = function({keyValPairs, optionalSkeleton, valPreference = 
       if (keyValPairs <= Object.keys(optionalSkeleton).length) {
         throw Error("Invalid keyValPairs: must be integer greater than existing keyValPairs in skeleton object.")
       }
-      return objectDepthControl(optionalSkeleton, 0, keyValPairs);
+      return objectDepthControl(optionalSkeleton, 0, keyValPairs, maxDepth);
     };
   }
   else {
-    return objectDepthControl({}, 0, keyValPairs || generateNumber(minKeyValPairs, maxKeyValPairs));
+    return objectDepthControl({}, 0, keyValPairs || generateNumber(minKeyValPairs, maxKeyValPairs), maxDepth);
   };
   return result;
 };
@@ -109,13 +109,13 @@ const generateObject = function({keyValPairs, optionalSkeleton, valPreference = 
 //if object is randomly generated, control depth so that it can only nest 3 levels
   //maxDepth will be 3 levels
   //every time another nested object is randomly generated, add to depth and build new object
-const objectDepthControl = function(currentObject, depth, keyVals) {
+const objectDepthControl = function(currentObject, depth, keyVals, maxDepth = 3) {
   var keyVals = keyVals || generateNumber(1, 5);
   let keyValCount = Object.keys(currentObject).length || 0;
   let val;
   while (keyValCount < keyVals) {
     let key = generateString(4,6, false, "lower");
-    if (depth > 3) {
+    if (depth > maxDepth) {
       val = generate.random(...primitives);
     }
     else {
