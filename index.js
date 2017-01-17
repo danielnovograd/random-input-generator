@@ -2,7 +2,7 @@ const generate = {
   number: () => generateNumber(),
   string: () => generateString(),
   boolean: () => Math.random() < .5,
-  object: () => generateObject(5),
+  object: () => generateObject(),
   random: function(...types){
     let typeIndex = types.length ? generateNumber(0, types.length - 1) : generateNumber(0,3);
     let type = types.length ? types[typeIndex] : typeArray[typeIndex];
@@ -128,12 +128,18 @@ const objectDepthControl = function(currentObject, depth, keyVals, maxDepth = 3)
   return currentObject;
 };
   //generate array of values, randomized by default
-const array = (maxLength = 10, valTypes = ["random"], templateArray) => {
+const generateArray = (maxLength, valTypes = ["random"], templateValue) => {
+  if (maxLength && typeof maxLength !== "number") {
+    throw new TypeError("Invalid argument: maxLength must be a number.");
+  };
+  if (!Array.isArray(valTypes)) {
+    throw new TypeError("Invalid argument: valTypes must be an array.");
+  };
+
   maxLength = maxLength || generateNumber(0, 10);
-  if (templateArray && !Array.isArray(templateArray)) {
-    console.error("Invalid templateArray: Not an array.")
+  if(Array.isArray(templateValue)) {
+
   }
-  let arr = templateArray || [];
   while(arr.length < maxLength) {
     let valType = valTypes.length > 1 ? generateNumber(0,valTypes.length) : valTypes[0]
     arr.push(generate[valType]());
@@ -149,5 +155,5 @@ module.exports = {
   enforceCase,
   generateBoolean,
   generateObject,
-  array: array
+  generateArray
 }

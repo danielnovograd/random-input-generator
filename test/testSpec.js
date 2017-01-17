@@ -328,6 +328,7 @@ describe('Arrays (generateArray', () => {
     });
     it('should be a function', () => {
       expect(generateArray).to.be.a('function');
+      expect(generateArray).to.not.throw();
     });
     it('should return an array', () => {
       expect(randomArray).to.be.an('array');
@@ -338,6 +339,15 @@ describe('Arrays (generateArray', () => {
     });
   });
   describe('Custom Random array', () => {
+    it('should throw an error for invalid parameters', () => {
+      let wrongArray1 = generateArray.bind(null, "seven");
+      let wrongArray2 = generateArray.bind(null, 5, "object");
+      let wrongArray3 = generateArray.bind(null, 7, ["random"], null);
+
+      expect(wrongArray1).to.throw();
+      expect(wrongArray2).to.throw();
+      expect(wrongArray3).to.throw();
+    });
     it('should have length less than or equal to maxLength parameter', () => {
       expect(randomArray(4).length).to.be.at.most(4);
     });
@@ -347,7 +357,11 @@ describe('Arrays (generateArray', () => {
     });
     it('should allow template values', () => {
       let randomArray = generateArray(10, null, {username: "hello", password: "readyToCopy"});
+      let randomArray2 = generateArray(8, null, [1,2,5]);
       expect(randomArray.every(obj => obj.username && obj.password)).to.equal(true);
+      expect(randomArray2[0]).to.equal(1);
+      expect(randomArray2[2]).to.equal(5);
+      expect(randomArray.length).to.equal(8);
     });
   });
 });
