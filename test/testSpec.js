@@ -269,13 +269,53 @@ describe('Booleans (generateBoolean)', () => {
 });
 
 describe('Objects (generateObject)', () => {
+  let randomObject;
   describe('Default Random Object', () => {
+    beforeEach(() => {
+      randomObject = generateObject();
+    });
     it('should be a function', () => {
       expect(generateObject).to.be.a('function');
     });
     it('should return an object', () => {
       expect(generateObject).to.not.throw();
-      expect(generateObject()).to.be.a('object');
+      expect(randomObject).to.be.a('object');
+    });
+    it('should return an object with between 2 and 6 key-value pairs', () => {
+      let keyValPairs = Object.keys(randomObject).length;
+      expect(keyValPairs).to.be.at.least(2);
+      expect(keyValPairs).to.be.at.most(6);
+    });
+  });
+  describe('Custom Random Object', () => {
+    describe('Configuration Object', () => {
+      it('should throw an error without configuration object', () => {
+        expect(generateObject.bind(null, "makeAnObject")).to.throw();
+      });
+    });
+    describe('keyValPair parameter', () => {
+      it('should generate object with exact keyValPairs', () => {
+        expect(Object.keys(generateObject({keyValPairs: 3})).length).to.equal(3);
+        expect(Object.keys(generateObject({keyValPairs: 5})).length).to.equal(5);
+        expect(Object.keys(generateObject({keyValPairs: 20})).length).to.equal(20);
+      });
+    });
+    describe('optionalSkeleton parameter',() => {
+      it('should not allow a non-object value', () => {
+        expect(generateObject.bind(null, {keyValPairs: 3, optionalSkeleton: "wrong"})).to.throw();
+      });
+      describe('optionalSkeletonArray', () => {
+        let skeleton;
+        beforeEach(() => {
+          skeleton = ["dog", "cat", "fish"];
+        });
+        it('should allow an array as a skeleton object', () => {
+          expect(generateObject.bind(null, {keyValPairs: 4, optionalSkeleton: skeleton})).to.not.throw();
+        });
+        it('should produce an object with keys for each array element', () => {
+          expect(generateObject)
+        });
+      });
     });
   });
 });

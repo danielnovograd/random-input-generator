@@ -68,8 +68,14 @@ const generateBoolean = (weightPercentage) => {
     return Math.random() < (weightPercentage ? weightPercentage / 100 : .5);
   };
   //generate object
-const generateObject = (keyValPairs, optionalSkeleton, valPreference = ["random"], minKeyValPairs = 2, maxKeyValPairs = 6) => {
+const generateObject = function({keyValPairs, optionalSkeleton, valPreference = [], minKeyValPairs = 2, maxKeyValPairs = 6} = {}) {
   let result = {};
+  if (arguments[0] !== null && typeof arguments[0] !== "object" && arguments[0] !== undefined) {
+    throw new TypeError("Invalid parameter: must provide configuration object.")
+  }
+  if (valPreference.length && !valPreference.every(type => generate[type])) {
+    throw Error("Invalid parameter: enter valPreferences that align with generate object's keys.")
+  }
   //if skeleton argument is provided
   if (optionalSkeleton) {
     if (typeof optionalSkeleton !== "object") {
@@ -78,18 +84,20 @@ const generateObject = (keyValPairs, optionalSkeleton, valPreference = ["random"
     //if array of keys is provided --> vals are randomized
     else if (Array.isArray(optionalSkeleton)) {
       optionalSkeleton.forEach(key => {
-        let valType = generate.type();
+        if (typeof key !== "string") {
+          throw Error("Invalid key type: All properties of destination object must be strings");
+        }
+        let valType = valPreference.length ? valPreference(generateNumber(0, valPreference.length - 1)) : generate.type();
         val = valType === "object" ? objectDepthControl({}, 1) : generate[valType]();
         result[key] = val;
       });
     }
     //if skeleton object provided: keys with default values
     else {
-      result = optionalSkeleton;
-      for (var key in optionalSkeleton) {
-        result[key] = generate[optionalSkeleton[key]] ? generate[optionalSkeleton[key]]()
-          : optionalSkeleton[key] || generate.random();
-      };
+      if (keyValPairs <= Object.keys(optionalSkeleton).length) {
+        throw Error("Invalid keyValPairs: must be integer greater than existing keyValPairs in skeleton object.")
+      }
+      return objectDepthControl(optionalSkeleton, 0, keyValPairs);
     };
   }
   else {
@@ -103,7 +111,7 @@ const generateObject = (keyValPairs, optionalSkeleton, valPreference = ["random"
   //every time another nested object is randomly generated, add to depth and build new object
 const objectDepthControl = function(currentObject, depth, keyVals) {
   var keyVals = keyVals || generateNumber(1, 5);
-  let keyValCount = 0;
+  let keyValCount = Object.keys(currentObject).length || 0;
   let val;
   while (keyValCount < keyVals) {
     let key = generateString(4,6, false, "lower");
@@ -131,7 +139,7 @@ const array = (maxLength = 10, valTypes = ["random"], templateArray) => {
     arr.push(generate[valType]());
   }
   return arr;
-}
+};
 
 module.exports = {
   generateNumber,
