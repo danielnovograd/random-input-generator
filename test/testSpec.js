@@ -1,7 +1,7 @@
 const {expect, assert} = require('chai');
 const generator = require('../index.js');
 const { fnRunner } = require('./test_helpers.js');
-const { generateNumber, generateString, generateBoolean, generateObject } = generator;
+const { generateNumber, generateString, generateBoolean, generateObject, generateArray } = generator;
 
 describe('Numbers (generateNumber)', () => {
   let randomNum;
@@ -313,9 +313,41 @@ describe('Objects (generateObject)', () => {
           expect(generateObject.bind(null, {keyValPairs: 4, optionalSkeleton: skeleton})).to.not.throw();
         });
         it('should produce an object with keys for each array element', () => {
-          expect(generateObject)
+          expect(generateObject);
         });
       });
+    });
+  });
+});
+
+describe('Arrays (generateArray', () => {
+  let randomArray;
+  describe('Default Random Array', () => {
+    beforeEach(() => {
+      randomArray = generateArray();
+    });
+    it('should be a function', () => {
+      expect(generateArray).to.be.a('function');
+    });
+    it('should return an array', () => {
+      expect(randomArray).to.be.an('array');
+    });
+    it('should produce an array of length between 0 and 10', () => {
+      expect(randomArray.length).to.be.at.least(0);
+      expect(randomArray.length).to.be.at.most(10);
+    });
+  });
+  describe('Custom Random array', () => {
+    it('should have length less than or equal to maxLength parameter', () => {
+      expect(randomArray(4).length).to.be.at.most(4);
+    });
+    it('should only contain values specified in valTypes parameter', () => {
+      let randomArray = generateArray(10, ["number", "string"]);
+      expect(randomArray.every((value) => typeof value === "number" || typeof value === "string")).to.equal(true);
+    });
+    it('should allow template values', () => {
+      let randomArray = generateArray(10, null, {username: "hello", password: "readyToCopy"});
+      expect(randomArray.every(obj => obj.username && obj.password)).to.equal(true);
     });
   });
 });
