@@ -3,6 +3,7 @@ const generate = {
   string: () => generateString(),
   boolean: () => Math.random() < .5,
   object: () => generateObject(),
+  array: () => generateArray(),
   random: function(...types){
     let typeIndex = types.length ? generateNumber(0, types.length - 1) : generateNumber(0,3);
     let type = types.length ? types[typeIndex] : typeArray[typeIndex];
@@ -128,7 +129,7 @@ const objectDepthControl = function(currentObject, depth, keyVals, maxDepth = 3)
   return currentObject;
 };
   //generate array of values, randomized by default
-const generateArray = function({maxLength, valTypes = [], templateValue} = {}) {
+const generateArray = function({maxLength, valTypes = [], templateArray = [], valueGenerator} = {}) {
   if (arguments[0] !== null && typeof arguments[0] !== "object" && arguments[0] !== undefined) {
     throw new TypeError("Invalid argument: must provide configuration object.")
   }
@@ -138,27 +139,30 @@ const generateArray = function({maxLength, valTypes = [], templateValue} = {}) {
   if (!Array.isArray(valTypes)) {
     throw new TypeError("Invalid argument: valTypes must be an array.");
   };
+  if (!Array.isArray(templateArray)) {
+    throw new TypeError("Invalid argument: templateArray must be an array.");
+  };
   maxLength = maxLength || generateNumber(0, 10);
   let arr;
-  if(Array.isArray(templateValue)) {
-    arr = templateValue.slice();
+  if(templateArray.length) {
+    arr = templateArray.slice();
     while(arr.length < maxLength) {
       let valType = valTypes.length ? valTypes[generateNumber(0, valTypes.length - 1)] : generate.type();
       arr.push(generate[valType]());
     }
   }
-  else if(templateValue === null) {
-    throw new TypeError("Invalid argument: templateValue must be a truthy value.");
-  }
   else {
     arr = [];
-    while(arr.length < maxLength) {
-      if (!templateValue) {
+    if (!valueGenerator) {
+      while(arr.length < maxLength) {
         let valType = valTypes.length ? valTypes[generateNumber(0, valTypes.length - 1)] : generate.type();
         arr.push(generate[valType]());
       }
-      else {
-        arr.push(templateValue);
+    }
+    else {
+      while(arr.length < maxLength) {
+        let val = typeof valueGenerator === "function" ? valueGenerator() : valueGenerator;
+        arr.push(val);
       }
     }
   }

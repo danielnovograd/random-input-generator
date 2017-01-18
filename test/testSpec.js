@@ -355,14 +355,22 @@ describe('Arrays (generateArray', () => {
       let randomArray = generateArray({maxLength: 10, valTypes: ["number", "string"]});
       expect(randomArray.every((value) => typeof value === "number" || typeof value === "string")).to.equal(true);
     });
-    it('should allow template values', () => {
-      let randomArray = generateArray({maxLength: 10, templateValue: {username: "hello", password: "readyToCopy"}});
-      let randomArray2 = generateArray({maxLength: 8, templateValue: [1,2,5]});
-      expect(randomArray.every(obj => obj.username && obj.password)).to.equal(true);
+    it('should allow template Arrays', () => {
+      let randomArray2 = generateArray({maxLength: 8, templateArray: [1,2,5]});
 
       expect(randomArray2[0]).to.equal(1);
       expect(randomArray2[2]).to.equal(5);
       expect(randomArray2.length).to.equal(8);
+    });
+    describe('valueGenerator parameter', () => {
+      it('should allow non-functions', () => {
+        let randomArray = generateArray({maxLength: 10, valueGenerator: {username: "hello", password: "readyToCopy"}});
+        expect(randomArray.every(obj => obj.username === "hello" && obj.password === "readyToCopy")).to.equal(true);
+      });
+      it('should allow functions for valueGenerators',() => {
+        let randomArray = generateArray({maxLength: 6, valueGenerator: () => generateString(4,8, false)});
+        expect(randomArray.every(val => typeof val === "string")).to.equal(true);
+      });
     });
   });
 });
