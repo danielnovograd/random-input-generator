@@ -128,21 +128,39 @@ const objectDepthControl = function(currentObject, depth, keyVals, maxDepth = 3)
   return currentObject;
 };
   //generate array of values, randomized by default
-const generateArray = (maxLength, valTypes = ["random"], templateValue) => {
+const generateArray = function({maxLength, valTypes = [], templateValue} = {}) {
+  if (arguments[0] !== null && typeof arguments[0] !== "object" && arguments[0] !== undefined) {
+    throw new TypeError("Invalid argument: must provide configuration object.")
+  }
   if (maxLength && typeof maxLength !== "number") {
     throw new TypeError("Invalid argument: maxLength must be a number.");
   };
   if (!Array.isArray(valTypes)) {
     throw new TypeError("Invalid argument: valTypes must be an array.");
   };
-
   maxLength = maxLength || generateNumber(0, 10);
+  let arr;
   if(Array.isArray(templateValue)) {
-
+    arr = templateValue.slice();
+    while(arr.length < maxLength) {
+      let valType = valTypes.length ? valTypes[generateNumber(0, valTypes.length - 1)] : generate.type();
+      arr.push(generate[valType]());
+    }
   }
-  while(arr.length < maxLength) {
-    let valType = valTypes.length > 1 ? generateNumber(0,valTypes.length) : valTypes[0]
-    arr.push(generate[valType]());
+  else if(templateValue === null) {
+    throw new TypeError("Invalid argument: templateValue must be a truthy value.");
+  }
+  else {
+    arr = [];
+    while(arr.length < maxLength) {
+      if (!templateValue) {
+        let valType = valTypes.length ? valTypes[generateNumber(0, valTypes.length - 1)] : generate.type();
+        arr.push(generate[valType]());
+      }
+      else {
+        arr.push(templateValue);
+      }
+    }
   }
   return arr;
 };

@@ -349,19 +349,20 @@ describe('Arrays (generateArray', () => {
       expect(wrongArray3).to.throw();
     });
     it('should have length less than or equal to maxLength parameter', () => {
-      expect(randomArray(4).length).to.be.at.most(4);
+      expect(generateArray({maxLength: 4}).length).to.be.at.most(4);
     });
     it('should only contain values specified in valTypes parameter', () => {
-      let randomArray = generateArray(10, ["number", "string"]);
+      let randomArray = generateArray({maxLength: 10, valTypes: ["number", "string"]});
       expect(randomArray.every((value) => typeof value === "number" || typeof value === "string")).to.equal(true);
     });
     it('should allow template values', () => {
-      let randomArray = generateArray(10, null, {username: "hello", password: "readyToCopy"});
-      let randomArray2 = generateArray(8, null, [1,2,5]);
+      let randomArray = generateArray({maxLength: 10, templateValue: {username: "hello", password: "readyToCopy"}});
+      let randomArray2 = generateArray({maxLength: 8, templateValue: [1,2,5]});
       expect(randomArray.every(obj => obj.username && obj.password)).to.equal(true);
+
       expect(randomArray2[0]).to.equal(1);
       expect(randomArray2[2]).to.equal(5);
-      expect(randomArray.length).to.equal(8);
+      expect(randomArray2.length).to.equal(8);
     });
   });
 });
