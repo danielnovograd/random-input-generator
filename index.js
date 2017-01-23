@@ -165,16 +165,19 @@ const generateArray = function({setLength, minLength = 0, maxLength = 5, valType
 const arrayDepthControl = function(currentArray, depth, maxLength, maxDepth = 3, valTypes = []) {
   var values = maxLength || generateNumber(0, 4);
   let val;
-  while (currentArray.length < values) {
-    if (depth > maxDepth) {
+  if (depth > maxDepth) {
+    while (currentArray.length < values) {
       val = generate.random(...primitives);
+      currentArray.push(val);
     }
-    else {
+  }
+  else {
+    while (currentArray.length < values) {
       let valType = valTypes.length ? valTypes[generateNumber(0, valTypes.length - 1)] : generate.type();
       val = valType === "object" ? objectDepthControl({}, depth + 1) :
         valType === "array" ? arrayDepthControl([], depth + 1) : generate[valType]();
-    };
-    currentArray.push(val);
+      currentArray.push(val);
+    }
   };
   return currentArray;
 };
