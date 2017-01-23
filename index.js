@@ -163,7 +163,7 @@ const generateArray = function({setLength, minLength = 0, maxLength = 5, valType
 };
 
 const arrayDepthControl = function(currentArray, depth, maxLength, maxDepth = 3, valTypes = []) {
-  var values = maxLength || generateNumber(0, 5);
+  var values = maxLength || generateNumber(0, 4);
   let val;
   while (currentArray.length < values) {
     if (depth > maxDepth) {

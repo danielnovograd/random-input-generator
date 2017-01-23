@@ -348,6 +348,9 @@ describe('Arrays (generateArray', () => {
       expect(wrongArray2).to.throw();
       expect(wrongArray3).to.throw();
     });
+    it('should be of defined length if setLength config provided', () => {
+      expect(generateArray({setLength: 12}).length).to.equal(12);
+    });
     it('should have length less than or equal to maxLength parameter', () => {
       expect(generateArray({maxLength: 4}).length).to.be.at.most(4);
     });
@@ -370,6 +373,25 @@ describe('Arrays (generateArray', () => {
       it('should allow functions for valueGenerators',() => {
         let randomArray = generateArray({maxLength: 6, valueGenerator: () => generateString(4,8, false)});
         expect(randomArray.every(val => typeof val === "string")).to.equal(true);
+      });
+    });
+    describe('Depth Control', () => {
+      it('should not exceed the maxDepth specified', () => {
+        let randomArray = generateArray({valTypes: ["array", "object"]});
+        let deepestDepth = 0;
+        function depthTest(array, currentDepth) {
+          if (currentDepth > deepestDepth) {
+            deepestDepth = currentDepth;
+            return;
+          }
+          for (var i = 0; i < array.length; i++) {
+            if(Array.isArray(array[i])) {
+              depthTest(array[i], currentDepth + 1);
+            }
+          }
+        }
+        depthTest(randomArray, 0);
+        expect(deepestDepth).to.be.at.most(4);
       });
     });
   });
