@@ -357,10 +357,10 @@ describe('Arrays (generateArray', () => {
     });
     it('should allow template Arrays', () => {
       let randomArray2 = generateArray({maxLength: 8, templateArray: [1,2,5]});
-
       expect(randomArray2[0]).to.equal(1);
       expect(randomArray2[2]).to.equal(5);
-      expect(randomArray2.length).to.equal(8);
+      expect(randomArray2.length).to.be.at.most(8);
+      expect(randomArray2.length).to.be.at.least(3);
     });
     describe('valueGenerator parameter', () => {
       it('should allow non-functions', () => {

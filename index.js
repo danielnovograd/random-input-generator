@@ -1,3 +1,5 @@
+'use strict'
+
 const generate = {
   number: () => generateNumber(),
   string: () => generateString(),
@@ -12,13 +14,13 @@ const generate = {
   type: () => typeArray[generateNumber(0, typeArray.length - 1)]
 };
 
-const typeArray = ["number", "string", "boolean", "object"];
+const typeArray = ["number", "string", "boolean", "object", "array"];
 const primitives = ["number", "string", "boolean"];
 
 //create random number
 const generateNumber = (min = 0, max = 10000) => min > max ?
       Error('Invalid Arguments: min argument must be less than max') :
-      Math.floor(Math.random() * (max + 1 - min) + min);
+      Math.floor(Math.random() * (max - min + 1)) + min;
   //create random string, default (0-8 characters, can be symbols, casing "upper" or "lower")
 const generateString = (minLength = 4, maxLength = 12, nonLetters = true, casing) => {
     if (typeof minLength !== "number" || typeof maxLength !== "number" || typeof nonLetters !== "boolean" || (typeof casing !== "undefined" && typeof casing !== "string")) {
@@ -88,8 +90,8 @@ const generateObject = function({keyValPairs, optionalSkeleton, valPreference = 
         if (typeof key !== "string") {
           throw Error("Invalid key type: All properties of destination object must be strings");
         }
-        let valType = valPreference.length ? valPreference(generateNumber(0, valPreference.length - 1)) : generate.type();
-        val = valType === "object" ? objectDepthControl({}, 1) : generate[valType]();
+        let valType = valPreference.length ? valPreference[generateNumber(0, valPreference.length - 1)] : generate.type();
+        var val = valType === "object" ? objectDepthControl({}, 1) : generate[valType]();
         result[key] = val;
       });
     }
@@ -113,23 +115,25 @@ const generateObject = function({keyValPairs, optionalSkeleton, valPreference = 
 const objectDepthControl = function(currentObject, depth, keyVals, maxDepth = 3) {
   var keyVals = keyVals || generateNumber(1, 5);
   let keyValCount = Object.keys(currentObject).length || 0;
-  let val;
+
   while (keyValCount < keyVals) {
     let key = generateString(4,6, false, "lower");
     if (depth > maxDepth) {
-      val = generate.random(...primitives);
+      var val = generate.random(...primitives);
     }
     else {
       var valType = generate.type();
-      val = valType === "object" ? objectDepthControl({}, depth + 1) : generate[valType]();
+      var val = valType === "object" ? objectDepthControl({}, depth + 1) :
+        valType === "array" ? arrayDepthControl([], depth + 1) : generate[valType]();
     };
+
     currentObject[key] = val;
     keyValCount++;
   };
   return currentObject;
 };
   //generate array of values, randomized by default
-const generateArray = function({maxLength, valTypes = [], templateArray = [], valueGenerator} = {}) {
+const generateArray = function({setLength, minLength = 0, maxLength = 5, valTypes = [], templateArray = [], valueGenerator} = {}) {
   if (arguments[0] !== null && typeof arguments[0] !== "object" && arguments[0] !== undefined) {
     throw new TypeError("Invalid argument: must provide configuration object.")
   }
@@ -142,31 +146,37 @@ const generateArray = function({maxLength, valTypes = [], templateArray = [], va
   if (!Array.isArray(templateArray)) {
     throw new TypeError("Invalid argument: templateArray must be an array.");
   };
-  maxLength = maxLength || generateNumber(0, 10);
-  let arr;
-  if(templateArray.length) {
-    arr = templateArray.slice();
-    while(arr.length < maxLength) {
-      let valType = valTypes.length ? valTypes[generateNumber(0, valTypes.length - 1)] : generate.type();
-      arr.push(generate[valType]());
-    }
+
+  let length = setLength || generateNumber(minLength, maxLength);
+  let arr = templateArray.length ? [].concat(templateArray) : [];
+
+  if (!valueGenerator) {
+    return arrayDepthControl(arr, 0, length, 3, valTypes);
   }
   else {
-    arr = [];
-    if (!valueGenerator) {
-      while(arr.length < maxLength) {
-        let valType = valTypes.length ? valTypes[generateNumber(0, valTypes.length - 1)] : generate.type();
-        arr.push(generate[valType]());
-      }
+    while(arr.length < length) {
+      let val = typeof valueGenerator === "function" ? valueGenerator() : valueGenerator;
+      arr.push(val);
+    };
+  };
+  return arr;
+};
+
+const arrayDepthControl = function(currentArray, depth, maxLength, maxDepth = 3, valTypes = []) {
+  var values = maxLength || generateNumber(0, 5);
+  let val;
+  while (currentArray.length < values) {
+    if (depth > maxDepth) {
+      val = generate.random(...primitives);
     }
     else {
-      while(arr.length < maxLength) {
-        let val = typeof valueGenerator === "function" ? valueGenerator() : valueGenerator;
-        arr.push(val);
-      }
-    }
-  }
-  return arr;
+      let valType = valTypes.length ? valTypes[generateNumber(0, valTypes.length - 1)] : generate.type();
+      val = valType === "object" ? objectDepthControl({}, depth + 1) :
+        valType === "array" ? arrayDepthControl([], depth + 1) : generate[valType]();
+    };
+    currentArray.push(val);
+  };
+  return currentArray;
 };
 
 module.exports = {
