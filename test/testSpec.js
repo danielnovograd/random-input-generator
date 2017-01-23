@@ -1,7 +1,7 @@
 const {expect, assert} = require('chai');
 const generator = require('../index.js');
 const { fnRunner } = require('./test_helpers.js');
-const { generateNumber, generateString, generateBoolean, generateObject } = generator;
+const { generateNumber, generateString, generateBoolean, generateObject, generateArray } = generator;
 
 describe('Numbers (generateNumber)', () => {
   let randomNum;
@@ -313,8 +313,85 @@ describe('Objects (generateObject)', () => {
           expect(generateObject.bind(null, {keyValPairs: 4, optionalSkeleton: skeleton})).to.not.throw();
         });
         it('should produce an object with keys for each array element', () => {
-          expect(generateObject)
+          expect(generateObject);
         });
+      });
+    });
+  });
+});
+
+describe('Arrays (generateArray', () => {
+  let randomArray;
+  describe('Default Random Array', () => {
+    beforeEach(() => {
+      randomArray = generateArray();
+    });
+    it('should be a function', () => {
+      expect(generateArray).to.be.a('function');
+      expect(generateArray).to.not.throw();
+    });
+    it('should return an array', () => {
+      expect(randomArray).to.be.an('array');
+    });
+    it('should produce an array of length between 0 and 10', () => {
+      expect(randomArray.length).to.be.at.least(0);
+      expect(randomArray.length).to.be.at.most(10);
+    });
+  });
+  describe('Custom Random array', () => {
+    it('should throw an error for invalid parameters', () => {
+      let wrongArray1 = generateArray.bind(null, "seven");
+      let wrongArray2 = generateArray.bind(null, 5, "object");
+      let wrongArray3 = generateArray.bind(null, 7, ["random"], null);
+
+      expect(wrongArray1).to.throw();
+      expect(wrongArray2).to.throw();
+      expect(wrongArray3).to.throw();
+    });
+    it('should be of defined length if setLength config provided', () => {
+      expect(generateArray({setLength: 12}).length).to.equal(12);
+    });
+    it('should have length less than or equal to maxLength parameter', () => {
+      expect(generateArray({maxLength: 4}).length).to.be.at.most(4);
+    });
+    it('should only contain values specified in valTypes parameter', () => {
+      let randomArray = generateArray({maxLength: 10, valTypes: ["number", "string"]});
+      expect(randomArray.every((value) => typeof value === "number" || typeof value === "string")).to.equal(true);
+    });
+    it('should allow template Arrays', () => {
+      let randomArray2 = generateArray({maxLength: 8, templateArray: [1,2,5]});
+      expect(randomArray2[0]).to.equal(1);
+      expect(randomArray2[2]).to.equal(5);
+      expect(randomArray2.length).to.be.at.most(8);
+      expect(randomArray2.length).to.be.at.least(3);
+    });
+    describe('valueGenerator parameter', () => {
+      it('should allow non-functions', () => {
+        let randomArray = generateArray({maxLength: 10, valueGenerator: {username: "hello", password: "readyToCopy"}});
+        expect(randomArray.every(obj => obj.username === "hello" && obj.password === "readyToCopy")).to.equal(true);
+      });
+      it('should allow functions for valueGenerators',() => {
+        let randomArray = generateArray({maxLength: 6, valueGenerator: () => generateString(4,8, false)});
+        expect(randomArray.every(val => typeof val === "string")).to.equal(true);
+      });
+    });
+    describe('Depth Control', () => {
+      it('should not exceed the maxDepth specified', () => {
+        let randomArray = generateArray({valTypes: ["array", "object"]});
+        let deepestDepth = 0;
+        function depthTest(array, currentDepth) {
+          if (currentDepth > deepestDepth) {
+            deepestDepth = currentDepth;
+            return;
+          }
+          for (var i = 0; i < array.length; i++) {
+            if(Array.isArray(array[i])) {
+              depthTest(array[i], currentDepth + 1);
+            }
+          }
+        }
+        depthTest(randomArray, 0);
+        expect(deepestDepth).to.be.at.most(4);
       });
     });
   });
