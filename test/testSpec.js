@@ -1,7 +1,7 @@
-const {expect, assert} = require('chai');
+const expect = require('chai').expect;
 const generator = require('../index.js');
 const { fnRunner } = require('./test_helpers.js');
-const { generateNumber, generateString, generateBoolean, generateObject, generateArray } = generator;
+const { generateNumber, generateString, generateBoolean, generateObject, generateArray, defaultGenerator } = generator;
 
 describe('Numbers (generateNumber)', () => {
   let randomNum;
@@ -19,6 +19,10 @@ describe('Numbers (generateNumber)', () => {
     it('should not throw an error with default parameters', () => {
       let defaultNumRun = fnRunner(generateNumber);
       expect(defaultNumRun).to.not.throw();
+    });
+    it('should accept an argument for rounding', () => {
+      expect(randomNum).to.equal(Math.floor(randomNum));
+      expect(generateNumber(10,20,false)).to.not.equal(Math.floor(randomNum));
     });
   });
   describe('Random Numbers with Range', () => {
@@ -297,7 +301,7 @@ describe('Objects (generateObject)', () => {
       it('should generate object with exact keyValPairs', () => {
         expect(Object.keys(generateObject({keyValPairs: 3})).length).to.equal(3);
         expect(Object.keys(generateObject({keyValPairs: 5})).length).to.equal(5);
-        expect(Object.keys(generateObject({keyValPairs: 20})).length).to.equal(20);
+        expect(Object.keys(generateObject({keyValPairs: 200})).length).to.equal(200);
       });
     });
     describe('optionalSkeleton parameter',() => {
@@ -309,11 +313,39 @@ describe('Objects (generateObject)', () => {
         beforeEach(() => {
           skeleton = ["dog", "cat", "fish"];
         });
-        it('should allow an array as a skeleton object', () => {
+        it('should accept valPreference arrays with values that match strings from typeArray', () => {
+          expect(generateObject.bind(null, {valPreference: ["string", "optional"]})).to.throw();
+          expect(generateObject.bind(null, {valPreference: ["number", "array"]})).to.not.throw();
+        });
+        it('should allow valPreference array in conjunction with skeletonArray', () => {
+          let compiledObject = generateObject({optionalSkeleton: skeleton, valPreference: ["string", "boolean"]});
+          let arrayOfKeys = Object.keys(compiledObject);
+          expect(arrayOfKeys.every(key => compiledObject[key] !== undefined)).to.equal(true);
+          expect(arrayOfKeys.length).to.equal(skeleton.length);
+          expect(arrayOfKeys.every(key => typeof compiledObject[key] === "string" || typeof compiledObject[key] === "boolean")).to.equal(true);
+
+          let skeleton2 = ["orange", "yellow", "green", "blue", "red"];
+          let compiledObject2 = generateObject({optionalSkeleton: skeleton2, valPreference: ["object", "array", "number"]});
+          let arrayOfKeys2 = Object.keys(compiledObject2);
+          expect(arrayOfKeys2.every(key => compiledObject2[key] !== undefined)).to.equal(true);
+          expect(arrayOfKeys2.length).to.equal(skeleton2.length);
+          expect(arrayOfKeys2.every(key => typeof compiledObject2[key] === "object" || typeof compiledObject2[key] === "array" || typeof compiledObject2[key] === "number")).to.equal(true);
+        });
+       it('should allow an array as a skeleton object', () => {
           expect(generateObject.bind(null, {keyValPairs: 4, optionalSkeleton: skeleton})).to.not.throw();
+          expect(generateObject.bind(null, {keyValPairs: 4, optionalSkeleton: [true]})).to.throw();
         });
         it('should produce an object with keys for each array element', () => {
-          expect(generateObject);
+          let generatedObject = generateObject({optionalSkeleton: skeleton});
+          expect(Object.keys(generatedObject).every(key => skeleton.indexOf(key) > -1)).to.equal(true);
+        });
+        it('should throw an error with a keyValPairs parameter that is less than length of optionalSkeleton object keys', () => {
+          let badConfig = {keyValPairs: 2, optionalSkeleton: {dog: true, cat: true, wombat: false}}
+          expect(generateObject.bind(null, badConfig)).to.throw();
+        });
+        it('should allow keyValPairs parameter that is greater than length of optionalSkeleton object keys', () => {
+          let goodConfig = {keyValPairs: 5, optionalSkeleton: {dog: true, cat: true, wombat: false}}
+          expect(generateObject.bind(null, goodConfig)).to.not.throw();
         });
       });
     });
@@ -340,13 +372,18 @@ describe('Arrays (generateArray', () => {
   });
   describe('Custom Random array', () => {
     it('should throw an error for invalid parameters', () => {
-      let wrongArray1 = generateArray.bind(null, "seven");
-      let wrongArray2 = generateArray.bind(null, 5, "object");
-      let wrongArray3 = generateArray.bind(null, 7, ["random"], null);
-
+      let wrongArray1 = generateArray.bind(null, {maxLength: "seven"});
+      let wrongArray2 = generateArray.bind(null, {valTypes: "boolean"});
+      let wrongArray3 = generateArray.bind(null, { maxLength: 7, valTypes: ["random"], templateArray: null});
+      let wrongArray4 = generateArray.bind(null, { setLength: "fourteen"});
+      let wrongArray5 = generateArray.bind(null, { minLength: true});
+      let wrongArray6 = generateArray.bind(null, "give me an array");
       expect(wrongArray1).to.throw();
       expect(wrongArray2).to.throw();
       expect(wrongArray3).to.throw();
+      expect(wrongArray4).to.throw();
+      expect(wrongArray5).to.throw();
+      expect(wrongArray6).to.throw();
     });
     it('should be of defined length if setLength config provided', () => {
       expect(generateArray({setLength: 12}).length).to.equal(12);
@@ -367,11 +404,11 @@ describe('Arrays (generateArray', () => {
     });
     describe('valueGenerator parameter', () => {
       it('should allow non-functions', () => {
-        let randomArray = generateArray({maxLength: 10, valueGenerator: {username: "hello", password: "readyToCopy"}});
+        let randomArray = generateArray({setLength: 10, valueGenerator: {username: "hello", password: "readyToCopy"}});
         expect(randomArray.every(obj => obj.username === "hello" && obj.password === "readyToCopy")).to.equal(true);
       });
       it('should allow functions for valueGenerators',() => {
-        let randomArray = generateArray({maxLength: 6, valueGenerator: () => generateString(4,8, false)});
+        let randomArray = generateArray({setLength: 15, valueGenerator: () => generateString(4,8, false)});
         expect(randomArray.every(val => typeof val === "string")).to.equal(true);
       });
     });
@@ -394,5 +431,16 @@ describe('Arrays (generateArray', () => {
         expect(deepestDepth).to.be.at.most(4);
       });
     });
+  });
+});
+
+describe('Default Generator', () => {
+  it('should generate a random value with default parameters', () => {
+    expect(defaultGenerator.object()).to.be.a('object');
+    expect(defaultGenerator.array()).to.be.a('array');
+    expect(defaultGenerator.number()).to.be.a('number');
+    expect(defaultGenerator.string()).to.be.a('string');
+    expect(defaultGenerator.boolean()).to.be.a('boolean');
+    expect(typeof defaultGenerator.random() in defaultGenerator).to.equal(true);
   });
 });
