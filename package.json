@@ -7,7 +7,9 @@
   "scripts": {
     "build": "babel index.js -d distribution",
     "prepublish": "npm run build",
-    "test": "cross-env NODE_ENV=test nyc --reporter=lcov mocha test/testSpec.js"
+    "test": "cross-env NODE_ENV=test nyc --reporter=lcov --reporter=text mocha test/testSpec.js",
+    "check-coverage": "cross-env NODE_ENV=test node_modules/.bin/nyc check-coverage --lines 100 --statements 100 --functions 100",
+    "precommit": "npm run test && npm run check-coverage"
   },
   "author": "Dan Novograd",
   "license": "MIT",
@@ -22,6 +24,7 @@
     "chai": "^3.5.0",
     "codecov": "^1.0.1",
     "cross-env": "^3.1.4",
+    "husky": "^0.13.1",
     "mocha": "^3.2.0",
     "nyc": "^10.1.2"
   },

@@ -96,7 +96,8 @@ const generateObject = function({keyValPairs, optionalSkeleton, valPreference = 
           throw Error("Invalid key type: All properties of destination object must be strings");
         }
         let valType = valPreference.length ? valPreference[generateNumber(0, valPreference.length - 1)] : generate.type();
-        var val = valType === "object" ? objectDepthControl({}, 1) : generate[valType]();
+        var val = valType === "object" ? objectDepthControl({}, 1) :
+        valType === "array" ? arrayDepthControl([], 1) : generate[valType]();
         result[key] = val;
       });
     }
