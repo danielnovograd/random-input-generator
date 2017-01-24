@@ -333,6 +333,8 @@ describe('Objects (generateObject)', () => {
         });
        it('should allow an array as a skeleton object', () => {
           expect(generateObject.bind(null, {keyValPairs: 4, optionalSkeleton: skeleton})).to.not.throw();
+          expect(generateObject.bind(null, {keyValPairs: 4, optionalSkeleton: ["object"]})).to.not.throw();
+          expect(generateObject.bind(null, {keyValPairs: 4, optionalSkeleton: ["array"]})).to.not.throw();
           expect(generateObject.bind(null, {keyValPairs: 4, optionalSkeleton: [true]})).to.throw();
         });
         it('should produce an object with keys for each array element', () => {
