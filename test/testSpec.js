@@ -1,4 +1,5 @@
-const {expect, assert} = require('chai');
+
+const { expect, assert } = require('chai');
 const generator = require('../index.js');
 const { fnRunner } = require('./test_helpers.js');
 const { generateNumber, generateString, generateBoolean, generateObject, generateArray } = generator;
