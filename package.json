@@ -6,24 +6,29 @@
   "repository": "https://github.com/danielnovograd/random-input-generator",
   "scripts": {
     "build": "babel index.js -d distribution",
-    "test": "cross-env NODE_ENV=test nyc --reporter=lcov --reporter=text mocha test/testSpec.js",
-    "prepublish": "npm run build"
+    "prepublish": "npm run build",
+    "test": "cross-env NODE_ENV=test nyc --reporter=lcov mocha test/testSpec.js"
   },
   "author": "Dan Novograd",
   "license": "MIT",
-  "files": ["distribution/index.js"],
+  "files": [
+    "distribution/index.js"
+  ],
   "devDependencies": {
     "babel-cli": "^6.22.2",
     "babel-plugin-istanbul": "^3.1.2",
     "babel-preset-es2015": "^6.22.0",
     "babel-register": "^6.22.0",
     "chai": "^3.5.0",
+    "codecov": "^1.0.1",
     "cross-env": "^3.1.4",
     "mocha": "^3.2.0",
     "nyc": "^10.1.2"
   },
   "nyc": {
-  "require": ["babel-register"],
+    "require": [
+      "babel-register"
+    ],
     "sourceMap": false,
     "instrument": false
   }
