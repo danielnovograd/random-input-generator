@@ -142,9 +142,10 @@ const generateArray = function({setLength, minLength = 0, maxLength = 5, valType
   if (arguments[0] !== null && typeof arguments[0] !== "object" && arguments[0] !== undefined) {
     throw new TypeError("Invalid argument: must provide configuration object.")
   }
-  if (maxLength && typeof maxLength !== "number") {
+  if (maxLength && typeof maxLength !== "number" || setLength && typeof setLength !== "number" || minLength && typeof minLength !== "number") {
     throw new TypeError("Invalid argument: maxLength must be a number.");
   };
+
   if (!Array.isArray(valTypes)) {
     throw new TypeError("Invalid argument: valTypes must be an array.");
   };
@@ -195,5 +196,6 @@ module.exports = {
   enforceCase,
   generateBoolean,
   generateObject,
-  generateArray
+  generateArray,
+  defaultGenerator: generate
 }

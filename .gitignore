@@ -39,3 +39,6 @@ bower_modules
 
 # Linting
 .eslintrc.json
+
+#npm-distribution
+distribution
