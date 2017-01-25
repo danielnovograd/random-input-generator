@@ -1,2 +1,6 @@
 index.js
 test
+coverage/
+.nyc_output/
+.travis.yml
+CONTRIBUTING.md
