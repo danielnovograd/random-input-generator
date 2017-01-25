@@ -1,8 +1,8 @@
 {
   "name": "random-input-generator",
   "version": "1.0.0",
-  "description": "Random data generator for testing.",
-  "main": "index.js",
+  "description": "Random JavaScript value generator for testing or seed data.",
+  "main": "./distribution/index.js",
   "repository": "https://github.com/danielnovograd/random-input-generator",
   "scripts": {
     "build": "babel index.js -d distribution",
