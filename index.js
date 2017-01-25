@@ -23,7 +23,7 @@ const generateNumber = (min = 0, max = 10000, rounded = true) => {
     throw Error('Invalid Arguments: min argument must be less than max');
   }
   else {
-    return rounded ? Math.floor(Math.random() * (max - min + 1)) + min : Math.random() * (max - min + 1) + min;
+    return rounded ? Math.floor(Math.random() * (max - min + 1)) + min : Math.random() * (max - min) + min;
   }
 };
   //create random string, default (0-8 characters, can be symbols, casing "upper" or "lower")
