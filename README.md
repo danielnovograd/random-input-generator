@@ -5,7 +5,7 @@
 
 # Introduction
 
-random-input-generator is a simple, easily-configurable module that generates common JavaScript values for quick and easy seed data.
+random-input-generator is a simple, easily-configurable module that generates common JavaScript values for quick and easy seed or testing data.
 
 # Issues
 
@@ -44,7 +44,7 @@ If you're using ES6/ES2015, feel free to use destructuring syntax:
 ## generateString
 **Parameters**
 - `minLength` **[number](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Number)?** Optional number representing the minimum (inclusive) length of randomly generated string. (optional, default `4`)
-- `max` **[number](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Number)?** Optional number representing the maximum (inclusive) length of a randomly generated string. (optional, default `12`)
+- `maxLength` **[number](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Number)?** Optional number representing the maximum (inclusive) length of a randomly generated string. (optional, default `12`)
 - `nonLetters` **[boolean](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Boolean)?** Optional true/false determining whether to include non-letter characters between Unicode values 32-127. (optional, default `true`)
 - `casing` **[string](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String)?** Optional string, either `"upper"` or `"lower"`, provided if either uppercase or lowercase string is preferred. (optional)
 
