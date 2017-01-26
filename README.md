@@ -16,13 +16,17 @@ To install the module, you can run `npm install random-input-generator` from you
 
 # Documentation
 
-For your generation pleasure, this module provides methods for generating randomized strings, booleans, numbers, objects, and arrays. Primitive-generating methods accept multiple arguments, whereas objects accept configuration objects.
+For your data generation pleasure, this module provides methods for generating randomized strings, booleans, numbers, objects, and arrays. Primitive-generating methods accept multiple arguments, whereas objects accept configuration objects.
 
 To get started, simply require in the module:
-` var randomInput = require('random-input-generator'); `
+```javascript
+var randomInput = require('random-input-generator');
+```
 
 If you're using ES6/ES2015, feel free to use destructuring syntax:
-`const { generateNumber, generateString, generateBoolean, generateObject, generateArray, defaultGenerator } = require('random-input-generator');`
+```javascript
+const { generateNumber, generateString, generateBoolean, generateObject, generateArray, defaultGenerator } = require('random-input-generator');
+```
 
 ## generateNumber
 **Parameters**
@@ -136,7 +140,7 @@ If you're using ES6/ES2015, feel free to use destructuring syntax:
   - `options.maxLength` **[number](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Number)?** Optional number representing the maximum (inclusive) length for a generated Array of random length. (optional, default `5`)
   - `options.valTypes` **[Array](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array)<[string](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String)>?** An array containing desired string value types for the generated Array. All strings in `valTypes` array must conform to one of the following value types `["string", "number", "boolean", "object", "array"]`. (optional, default `[]`)
   - `options.templateArray` **[Array](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array)<[string](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String)>?** An optional base array to which `generateArray` will add values according to either `options.setLength` or `options.minLength, options.maxLength`
-  - `options.valueGenerator` **([Function](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Statements/function)|[truthyValue](https://developer.mozilla.org/en-US/docs/Glossary/Truthy))?** Function or value to be used to populate the generated array. If an Array of identical truthy values is desired, `options.valueGenerator` should be assigned a truthyValue. If an Array of randomized values or identical falsey values is desired, a `options.valueGenerator` should be assigned a callback that returns a randomized value. *Will take precedence over `options.valTypes` array.* (optional)
+  - `options.valueGenerator` **([Function](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Statements/function)|[truthyValue](https://developer.mozilla.org/en-US/docs/Glossary/Truthy))?** Function or value to be used to populate the generated array. If an Array of identical truthy values is desired, `options.valueGenerator` should be assigned a truthyValue. If an Array of randomized values or identical falsey values is desired, `options.valueGenerator` should be assigned a callback that returns a randomized value. *Will take precedence over `options.valTypes` array.* (optional)
 
 **Examples**
 ```javascript
@@ -148,7 +152,13 @@ If you're using ES6/ES2015, feel free to use destructuring syntax:
   // [ true, true ]
 
   //with minLength, maxLength, templateArray, valTypes
-  generateArray({minLength: 4, maxLength: 6, valTypes: ['number'], templateArray:['r', 2, 'd']});
+  var arTooDeeRandom = {
+    minLength: 4,
+    maxLength: 6,
+    valTypes: ['number'],
+    templateArray:['r', 2, 'd']
+  };
+  generateArray(arTooDeeRandom);
   //[ 'r', 2, 'd', 2516, 8386, 7019 ]
 
   //with valueGenerator as a function
